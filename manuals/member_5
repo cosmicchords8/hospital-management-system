@@ -1,0 +1,233 @@
+STEP 1 — Billing Pages Introduced
+
+Files:
+
+hospital/bills.html
+hospital/billing.html
+
+Ownership:
+
+Member 5 — US007 Billing
+
+Purpose:
+
+billing.html:
+Create a new bill.
+
+bills.html:
+View and manage the list of bills.
+
+Current state:
+
+Both pages contain placeholder content only.
+
+Sidebar navigation already points to both pages.
+
+Future responsibilities:
+
+Bill ID generation
+Patient selection/linking
+Room charges
+Pharmacy charges
+Diagnostic charges
+Automatic total calculation
+PAID / UNPAID status
+Bill search
+Bill filtering
+Bill sorting
+Bill details
+Printing
+
+Important data relationship:
+
+Bills will reference patients using patientId.
+
+A bill should not duplicate the entire patient object.
+
+Conceptually:
+
+Patient
+   │
+   └── patientId
+          ↑
+          │
+        Bill
+
+This allows billing to be associated with an existing patient.
+
+
+STEP 2 — Billing Pages Use Common Shell
+
+Files:
+
+hospital/bills.html
+hospital/billing.html
+
+Both billing pages use the common application shell.
+
+Member 5 should focus on billing-specific content inside:
+
+<main class="main-content">
+
+The common header/sidebar/footer are maintained by Member 1.
+
+Future billing functionality includes:
+
+Bill creation
+Bill list
+Patient association
+Room charges
+Pharmacy charges
+Diagnostic charges
+Automatic total
+PAID / UNPAID status
+Search
+Filter
+Sort
+Bill details
+Printing
+
+
+COMMON SHELL RULE
+
+Billing pages use the common application shell.
+
+Member 5 owns billing functionality inside:
+
+<main class="main-content">
+
+Common navigation and layout remain owned by Member 1.
+
+STEP 3 — Patient to Billing Link
+
+The planned flow is:
+
+Patient Details
+    ↓
+Create Bill
+    ↓
+billing.html
+
+The bill will reference the patient using patientId.
+
+Billing does not create a duplicate patient record.
+
+
+STEP 4 — Patient Details Billing Entry Point
+
+Patient Details will eventually contain:
+
+Create Bill
+
+The current implementation does not create bills yet.
+
+The Patient ID will be used to connect the bill to
+the correct patient.
+
+Billing functionality will be implemented later.
+
+STEP 5 — Create Bill Navigation
+
+Patient Details now provides:
+
+Create Bill
+
+The link contains the patient's ID.
+
+Example:
+
+billing.html?patientId=PAT-000001
+
+This allows the billing page to know which patient
+the bill belongs to.
+
+The billing functionality itself has not been implemented yet.
+
+US007 — BILLING
+
+Billing uses separate storage from patients.
+
+Patient data:
+localStorage key = "patients"
+
+Bill data:
+localStorage key = "bills"
+
+
+File:
+hospital/js/bill-data.js
+
+Responsibility:
+Manage bill data.
+
+Functions:
+
+getBills()
+→ Gets all bills.
+
+saveBills(bills)
+→ Saves all bills.
+
+generateBillId()
+→ Creates IDs such as:
+BILL-000001
+
+addBill(bill)
+→ Adds a bill and saves it.
+
+
+Billing does not store the bill inside
+the patient object.
+
+A bill references a patient using:
+
+patientId
+
+
+Basic billing flow:
+
+Patient Details
+→ Create Bill
+→ Billing page
+→ Find patient
+→ Enter charges
+→ Calculate total
+→ Save bill
+
+BILLING — FINDING THE PATIENT
+
+File:
+hospital/js/billing.js
+
+Responsibility:
+Find the patient who is going to receive the bill
+and display basic patient information.
+
+The patient ID comes from the URL:
+
+billing.html?patientId=PAT-000001
+
+
+The billing page:
+1. Reads patientId from the URL.
+2. Gets patients using getPatients().
+3. Finds the matching patient.
+4. Displays Patient ID and Patient Name.
+
+If the patient cannot be found:
+
+"Patient not found."
+
+
+The bill will later store the patientId
+to link the bill to the patient.
+
+Example:
+
+Patient:
+PAT-000001
+
+Bill:
+BILL-000001
+patientId: PAT-000001
+

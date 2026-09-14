@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Bill Details - Hospital Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header
+        class="app-header"
+        id="appHeader"
+    >
+    </header>
+
+
+    <div class="app-layout">
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+        </aside>
+
+
+        <main class="main-content">
+
+            <h2>
+                Bill Details
+            </h2>
+
+
+            <div id="billDetails">
+                Loading bill...
+            </div>
+
+            <div id="billActions">
+
+                <button
+                    type="button"
+                    id="backToAllBillsButton"
+                    class="bill-action"
+                >
+                    Back to All Bills
+                </button>
+
+                <button
+                    type="button"
+                    id="patientDetailsButton"
+                    class="bill-action"
+                >
+                    Back to Patient Details
+                </button>
+
+                <button
+                    type="button"
+                    id="editBillButton"
+                    class="bill-action"
+                >
+                    Edit Bill
+                </button>
+
+                <button
+                    type="button"
+                    id="markPaidButton"
+                    class="bill-action"
+                >
+                    Mark as Paid
+                </button>
+
+                <button
+                    type="button"
+                    id="deleteBillButton"
+                    class="bill-action"
+                >
+                    Delete Bill
+                </button>
+
+            </div>
+
+
+            
+
+
+            <p id="billDetailsMessage">
+            </p>
+
+        </main>
+
+    </div>
+
+
+    <footer
+        class="app-footer"
+        id="appFooter"
+    >
+    </footer>
+
+
+    <script src="js/session.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+    <script src="js/bill-data.js"></script>
+
+    <script src="js/bill-details.js"></script>
+
+    <script src="js/app-shell.js"></script>
+
+</body>
+
+</html>

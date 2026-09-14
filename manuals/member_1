@@ -1,0 +1,1187 @@
+============================================================
+MEMBER 1 — MANUAL
+NEW CONCEPT: SHARED VALIDATION
+============================================================
+
+Files involved:
+
+hospital/js/validation.js
+hospital/js/auth.js
+hospital/js/signup.js
+
+
+1. RESPONSIBILITY OF validation.js
+
+validation.js contains reusable validation rules.
+
+It does NOT:
+- handle login
+- create accounts
+- manage sessions
+- access patient data
+- access billing data
+
+Its responsibility is only to answer whether
+input satisfies our application's validation rules.
+
+
+2. WHY SHARED VALIDATION?
+
+Both Login and Sign Up need to validate:
+
+- User ID
+- Password
+
+Instead of writing the same validation rules in both
+auth.js and signup.js, we put the rules in validation.js.
+
+The relationship is:
+
+                    validation.js
+                    /          \
+                   /            \
+              auth.js        signup.js
+
+This means that if a validation rule changes,
+we only need to change it in one place.
+
+
+3. FUNCTIONS
+
+isValidUserId(userId)
+
+Checks:
+- minimum 8 characters
+- letters and numbers only
+
+Returns:
+true  -> valid
+false -> invalid
+
+
+isValidPassword(password)
+
+Checks:
+- minimum 10 characters
+- uppercase letter
+- lowercase letter
+- number
+- special character
+
+Returns:
+true  -> valid
+false -> invalid
+
+
+4. REGULAR EXPRESSIONS
+
+We use regular expressions for simple pattern checks.
+
+Example:
+
+/^[A-Za-z0-9]+$/
+
+This means:
+- A-Z -> uppercase letters
+- a-z -> lowercase letters
+- 0-9 -> numbers
+- + -> one or more characters
+
+Therefore it allows:
+admission01
+admin1234
+
+but rejects:
+admin_123
+admin@123
+
+
+5. SCRIPT LOADING ORDER
+
+index.html loads:
+
+<script src="js/session.js"></script>
+<script src="js/user-data.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/auth.js"></script>
+
+The order matters.
+
+JavaScript files loaded with normal <script> tags
+execute in the order they appear.
+
+auth.js uses:
+- createSession() from session.js
+- findUserById() from user-data.js
+- isValidUserId() from validation.js
+- isValidPassword() from validation.js
+
+Therefore these dependencies must be loaded before auth.js.
+
+The same idea applies to signup.html:
+
+<script src="js/user-data.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/signup.js"></script>
+
+signup.js uses functions from user-data.js
+and validation.js, so they are loaded first.
+
+
+6. SRP INSIGHT
+
+A common beginner mistake is putting all logic into one file.
+
+For example:
+
+auth.js could technically contain:
+- validation
+- user lookup
+- password checking
+- session creation
+- localStorage handling
+
+But that would give auth.js too many responsibilities.
+
+Instead we currently have:
+
+auth.js
+    -> authentication
+
+user-data.js
+    -> user data
+
+validation.js
+    -> validation rules
+
+session.js
+    -> session management
+
+signup.js
+    -> account creation
+
+Each component has a clearer responsibility.
+
+
+7. IMPORTANT SECURITY INSIGHT
+
+Our prototype currently stores passwords directly
+in localStorage.
+
+Example:
+
+{
+    userId: "admission01",
+    password: "Hospital@1"
+}
+
+This is NOT secure.
+
+Anyone with browser developer tools can inspect
+localStorage.
+
+We are doing this only because this is a
+browser-only learning prototype with no backend.
+
+A real hospital application should not store passwords
+this way. Real applications use a backend and secure
+password hashing.
+
+Therefore:
+
+WORKING PROTOTYPE != PRODUCTION-READY SECURITY
+
+
+8. SIGN UP VS SESSION CREATION
+
+Our current flow is intentionally:
+
+Sign Up
+    ->
+Create account
+    ->
+Store user
+    ->
+Ask user to Login
+    ->
+Authenticate
+    ->
+Create session
+
+We could technically create the session immediately
+after Sign Up.
+
+We are not doing that currently because:
+
+signup.js
+    -> account creation
+
+auth.js
+    -> authentication
+
+session.js
+    -> session management
+
+are separate responsibilities.
+
+This gives us a practical example of SRP.
+
+
+9. EXPERIMENTS
+
+Experiment 1:
+Try invalid User IDs.
+
+Experiment 2:
+Try passwords missing uppercase/lowercase/number/special
+characters.
+
+Experiment 3:
+Change the minimum User ID length in validation.js
+and observe that both Login and Sign Up use the
+new rule.
+
+Experiment 4:
+Temporarily change the script order in index.html.
+Open the browser console and observe what happens.
+
+Experiment 5:
+Open browser Developer Tools -> Application ->
+Local Storage and inspect the users data.
+
+Experiment 6:
+Create a new account and observe how the users
+array changes in localStorage.
+
+
+10. IMPORTANT RULE FOR THE TEAM
+
+Do not duplicate validation rules in individual files
+when a shared validation function already exists.
+
+Use:
+
+isValidUserId()
+isValidPassword()
+
+instead of creating another version of the same rules.
+
+============================================================
+NEW CONCEPT: LOGIN ATTEMPTS AND TEMPORARY LOCKOUT
+============================================================
+
+New file:
+
+hospital/js/login-attempts.js
+
+
+1. RESPONSIBILITY
+
+login-attempts.js is responsible for:
+
+- counting failed login attempts
+- determining whether login is locked
+- determining remaining attempts
+- determining lockout expiry
+- resetting failed attempts
+
+
+It does NOT:
+
+- authenticate passwords
+- create users
+- create sessions
+- display the login form
+
+
+2. CONSTANTS
+
+MAX_LOGIN_ATTEMPTS = 3
+
+The maximum number of failed attempts allowed.
+
+LOCKOUT_DURATION_MINUTES = 1
+
+How long the temporary lockout lasts.
+
+We use 1 minute during development because it
+makes testing easier.
+
+
+3. WHERE LOCKOUT DATA IS STORED
+
+The prototype stores login attempt information
+in localStorage.
+
+Key:
+
+loginAttempts
+
+
+Example:
+
+{
+    "failedAttempts": 2,
+    "lockedUntil": null
+}
+
+
+localStorage is used because normal JavaScript
+variables disappear when the page is refreshed.
+
+
+4. IMPORTANT SECURITY / DESIGN NOTE
+
+This is a simplified browser-only prototype.
+
+The lockout implementation is NOT a production-grade
+authentication/security system.
+
+A real authentication system would normally have
+a backend and server-side account protection.
+
+We are using this implementation to learn:
+
+- state
+- localStorage
+- JSON
+- functions
+- time calculations
+- separation of responsibilities
+
+
+5. AUTHENTICATION FLOW
+
+Login flow is now:
+
+User submits login
+        ↓
+Check lockout
+        ↓
+Validate User ID
+        ↓
+Validate Password
+        ↓
+Find user
+        ↓
+Check password
+        ↓
+     ┌─────────────┐
+     │             │
+  Success        Failure
+     │             │
+     ↓             ↓
+Reset attempts  Record attempt
+     │             │
+     ↓             ↓
+Create session  Check lockout
+                   │
+                   ↓
+              Show remaining
+              attempts / lockout
+
+
+6. SRP INSIGHT
+
+auth.js does not contain the lockout algorithm.
+
+Instead it calls:
+
+recordFailedLogin()
+isLoginLocked()
+getRemainingAttempts()
+resetLoginAttempts()
+
+These functions belong to login-attempts.js.
+
+This means auth.js coordinates the login process
+while login-attempts.js manages lockout state.
+
+This is a practical example of SRP.
+
+
+7. SCRIPT ORDER
+
+index.html currently loads:
+
+<script src="js/session.js"></script>
+<script src="js/user-data.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/login-attempts.js"></script>
+<script src="js/auth.js"></script>
+
+The order matters because auth.js uses functions
+defined in the earlier files.
+
+Dependency order:
+
+session.js
+    ↓
+user-data.js
+    ↓
+validation.js
+    ↓
+login-attempts.js
+    ↓
+auth.js
+
+
+8. TIME HANDLING
+
+JavaScript Date objects are used to calculate
+the lockout expiry time.
+
+Conceptually:
+
+current time
+    +
+lockout duration
+    =
+lockedUntil
+
+
+Example:
+
+Current time: 10:00
+Lockout duration: 1 minute
+lockedUntil: 10:01
+
+
+The application then compares:
+
+current time < lockedUntil
+
+If true:
+login remains locked.
+
+If false:
+lockout has expired.
+
+
+9. JSON INSIGHT
+
+localStorage stores strings.
+
+Therefore we use:
+
+JSON.stringify()
+
+when saving an object.
+
+Example:
+
+localStorage.setItem(
+    "loginAttempts",
+    JSON.stringify(loginAttempts)
+);
+
+
+When reading it back:
+
+JSON.parse()
+
+converts the stored string back into
+a JavaScript object.
+
+Example:
+
+const loginAttempts =
+    JSON.parse(data);
+
+
+10. EXPERIMENTS
+
+Experiment 1:
+Change MAX_LOGIN_ATTEMPTS from 3 to 2.
+
+Observe when the lockout occurs.
+
+
+Experiment 2:
+Change LOCKOUT_DURATION_MINUTES from 1 to 2.
+
+Observe how long the lockout lasts.
+
+
+Experiment 3:
+Open Developer Tools -> Application ->
+Local Storage.
+
+Inspect loginAttempts after failed logins.
+
+
+Experiment 4:
+Refresh the page while locked.
+
+Observe whether the lockout remains.
+
+This demonstrates why localStorage was used instead
+of a normal JavaScript variable.
+
+
+Experiment 5:
+Successfully login after failed attempts.
+
+Inspect localStorage and observe that loginAttempts
+has been reset.
+
+
+Experiment 6:
+Temporarily remove the call to resetLoginAttempts()
+after successful login.
+
+Observe what happens to the failed attempt state.
+
+
+11. CURRENT LIMITATION
+
+The current prototype stores one shared loginAttempts
+object.
+
+Therefore failed attempts are not yet tracked
+separately for every user.
+
+A more advanced version could store:
+
+{
+    "admission01": {
+        failedAttempts: 2,
+        lockedUntil: null
+    },
+    "admission02": {
+        failedAttempts: 1,
+        lockedUntil: null
+    }
+}
+
+We are intentionally NOT implementing this yet
+because it is not necessary for the current
+learning step.
+
+
+12. IMPORTANT PRINCIPLE
+
+Do not add complexity simply because a production
+system might eventually need it.
+
+First make the simple requirement work.
+
+Then improve the design when the requirement
+actually requires it.
+
+
+STEP — Login Lockout Countdown
+
+File:
+hospital/js/auth.js
+
+New responsibility:
+Display the remaining lockout time to the user.
+
+Function:
+startLockoutCountdown()
+
+How it works:
+
+1. login-attempts.js stores the lockout end time.
+2. auth.js calls getLockoutEndTime().
+3. Date.now() gives the current time in milliseconds.
+4. The difference between the two gives remaining time.
+5. Math.ceil() converts the remaining milliseconds into seconds.
+6. setInterval() runs the countdown every 1 second.
+7. clearInterval() stops the countdown when the lockout ends.
+
+Important SRP rule:
+
+login-attempts.js owns lockout DATA and lockout RULES.
+
+auth.js owns the LOGIN PAGE BEHAVIOR and DISPLAY.
+
+Do not move all lockout logic into auth.js just because the countdown is displayed there.
+
+Important JavaScript concept:
+
+setInterval(function, 1000)
+
+means:
+"Run this function approximately every 1000 milliseconds."
+
+clearInterval(timer)
+
+stops that repeated execution.
+
+window.lockoutTimer is used so that we can keep track of the
+currently running countdown and prevent multiple countdowns
+from running at the same time.
+
+Experiment:
+
+Change:
+
+setInterval(updateCountdown, 1000)
+
+to:
+
+setInterval(updateCountdown, 500)
+
+The countdown will update twice as frequently.
+
+The displayed seconds will still decrease approximately once
+per second because the actual calculation is based on Date.now(),
+not on the number of interval executions.
+
+Why Date.now() is better than simply doing:
+
+remainingSeconds--;
+
+Because the browser can delay JavaScript execution.
+Calculating the difference between actual times is more reliable.
+
+Current limitation:
+
+The lockout is currently global in this prototype.
+
+That means the same loginAttempts object is used for all users.
+
+A production system would normally track attempts per account,
+and the backend would enforce the lockout.
+
+IMPORTANT JAVASCRIPT CONCEPT — Date vs Timestamp
+
+The application stores lockedUntil as an ISO date string:
+
+"2026-09-13T12:15:30.000Z"
+
+This is useful because it is human-readable and easy to
+store as JSON.
+
+Before performing time calculations, convert it to a
+timestamp number:
+
+new Date(dateString).getTime()
+
+A timestamp is simply a number representing a point in time.
+
+This allows calculations such as:
+
+lockoutEndTime - Date.now()
+
+The NaN problem happened because the countdown expected a
+numeric timestamp but getLockoutEndTime() was returning the
+ISO string directly.
+
+SRP remains unchanged:
+
+recordFailedLogin()
+    Creates and stores the lockout time.
+
+getLockoutEndTime()
+    Reads and converts the lockout time.
+
+auth.js
+    Uses the converted value to display the countdown.
+
+STEP — Protected Dashboard and Logout
+
+Files introduced:
+
+hospital/dashboard.html
+hospital/js/dashboard.js
+
+dashboard.html:
+Provides the first protected page after login.
+
+dashboard.js:
+Responsible for dashboard-specific behavior.
+
+It performs two main tasks:
+
+1. Check whether a valid session exists.
+2. Handle logout.
+
+Session protection:
+
+if (!isSessionValid()) {
+    window.location.href = "index.html";
+}
+
+This means:
+"If the current session is not valid, return to login."
+
+If the session is valid:
+
+getCurrentUser()
+
+retrieves the logged-in user's ID.
+
+The ID is then displayed on the dashboard.
+
+Logout:
+
+logout()
+
+removes the session information.
+
+After logout:
+
+window.location.href = "index.html";
+
+returns the user to the login page.
+
+Important concept:
+
+A protected page should not assume that the user arrived
+there through the login page.
+
+A user can directly type:
+
+dashboard.html
+
+into the browser.
+
+Therefore dashboard.js checks the session when the page loads.
+
+Script loading order:
+
+dashboard.html loads:
+
+session.js
+        ↓
+dashboard.js
+
+dashboard.js depends on functions from session.js,
+such as:
+
+isSessionValid()
+getCurrentUser()
+logout()
+
+Therefore session.js must be loaded first.
+
+Login flow:
+
+auth.js
+    ↓
+createSession()
+    ↓
+dashboard.html
+    ↓
+dashboard.js
+    ↓
+isSessionValid()
+    ↓
+show dashboard OR redirect to login
+
+Logout flow:
+
+dashboard.js
+    ↓
+logout()
+    ↓
+session destroyed
+    ↓
+index.html
+
+Current limitation:
+
+This is frontend-only session protection.
+
+sessionStorage can be manipulated by the user.
+It is suitable for this learning prototype, but not
+for real hospital security.
+
+Experiment:
+
+After logging in, open Developer Tools and inspect
+sessionStorage.
+
+You should see the session information created by
+session.js.
+
+Then click Logout and inspect sessionStorage again.
+
+The session should be gone.
+
+Another experiment:
+
+Open dashboard.html directly after logging out.
+
+The page should redirect to index.html.
+
+
+STEP — Common Application Shell
+
+File introduced/updated:
+
+hospital/dashboard.html
+hospital/css/style.css
+
+Purpose:
+
+Create the common structure that future application pages
+will share.
+
+The shell contains:
+
+1. Application header
+2. Current logged-in user
+3. Logout button
+4. Sidebar navigation
+5. Main content area
+
+Layout:
+
+app-header
+    ↓
+app-layout
+    ├── sidebar
+    └── main-content
+
+The sidebar contains navigation categories:
+
+Dashboard
+Patients
+    All Patients
+    New Patient
+Billing
+    All Bills
+    Create Bill
+Activity Log
+
+The links are currently placeholders.
+
+Feature owners will connect them to their actual pages
+when their stories are implemented.
+
+Global CSS:
+
+Common layout styles belong in:
+
+hospital/css/style.css
+
+Examples:
+
+.app-header
+.app-layout
+.sidebar
+.sidebar-section
+.main-content
+
+Reason:
+
+These styles are expected to be reused across multiple
+application pages.
+
+Important principle:
+
+Do not create a new CSS or JavaScript file just because
+a concept exists.
+
+Create a separate file when there is a clear independent
+responsibility or when reuse makes it worthwhile.
+
+HTML / CSS / JavaScript mental model:
+
+HTML:
+Defines the elements and structure.
+
+CSS:
+Controls appearance and layout.
+
+JavaScript:
+Controls behavior and application logic.
+
+Current limitation:
+
+Sidebar links are placeholders using href="#".
+
+They will later point to actual feature pages.
+
+Do not implement patient or billing behavior in the
+common shell.
+
+The respective team member owns those features.
+
+Experiment:
+
+Change:
+
+.sidebar {
+    width: 220px;
+}
+
+to:
+
+.sidebar {
+    width: 300px;
+}
+
+Observe how the page layout changes.
+
+This demonstrates that CSS controls layout without
+requiring JavaScript.
+
+
+STEP — Collapsible Sidebar
+
+New file:
+
+hospital/js/app-shell.js
+
+Responsibility:
+
+Handle behavior belonging to the common application shell.
+
+Current responsibility:
+
+Collapse and expand the sidebar.
+
+Important line:
+
+sidebar.classList.toggle("collapsed");
+
+classList.toggle() adds the class if it is not present
+and removes it if it is already present.
+
+This allows JavaScript to change the UI by changing
+a CSS class rather than manually changing many CSS properties.
+
+Relationship:
+
+JavaScript:
+    Adds/removes "collapsed"
+
+CSS:
+    Defines what "collapsed" means
+
+This is a useful separation of responsibility.
+
+app-shell.js does not decide how the collapsed sidebar
+looks.
+
+style.css does that.
+
+Why a new file was created:
+
+The sidebar behavior is now common application-shell
+behavior and can be reused by multiple pages.
+
+This is a stronger reason for a separate file than
+simply creating files for every small piece of code.
+
+
+STEP — Application Footer
+
+The common footer is currently written directly into
+each HTML page.
+
+It contains placeholder information:
+
+TCS Confidential
+Connect with us
+Location
+Contact
+
+Do not add real company contact information unless it
+is provided/approved for the project.
+
+The footer is currently static and requires no JavaScript.
+
+
+STEP — Navigation Pages
+
+The sidebar now navigates to actual HTML files:
+
+dashboard.html
+patients.html
+new-patient.html
+bills.html
+billing.html
+activity-log.html
+
+These pages currently contain placeholder content.
+
+Their feature responsibilities belong to the appropriate
+team members.
+
+Member 2:
+new-patient.html
+
+Member 3:
+patient editing/deleting functionality
+
+Member 4:
+patients.html
+
+Member 5:
+billing.html and bills.html
+
+Activity Log:
+common/system functionality owned by Member 1 unless
+the project later assigns it elsewhere.
+
+
+Important design decision:
+
+We are intentionally keeping the shell duplicated
+across pages for now.
+
+A templating/dynamic component system could remove this
+duplication, but it would introduce additional concepts.
+
+For this beginner frontend-only project, simple repeated
+HTML is currently easier to understand.
+
+Do not prematurely build a complex component system.
+
+
+Current application structure:
+
+Login
+    ↓
+Session
+    ↓
+Dashboard / protected pages
+    ↓
+Common header
+Common sidebar
+Common footer
+    ↓
+Feature pages
+
+
+Experiment:
+
+Click the sidebar toggle.
+
+Inspect the sidebar element in Developer Tools.
+
+Observe the "collapsed" class being added and removed.
+
+This demonstrates the relationship between:
+
+HTML element
+    +
+CSS class
+    +
+JavaScript classList.toggle()
+
+STEP — Reusable Application Shell
+
+File:
+
+hospital/js/app-shell.js
+
+Purpose:
+
+Provide the common application UI used by all protected pages.
+
+Responsibilities:
+
+createHeader()
+createSidebar()
+createFooter()
+setupSidebarToggle()
+setupLogout()
+
+The HTML pages no longer contain the actual header/sidebar/footer
+content.
+
+Instead they contain placeholders:
+
+<header id="appHeader"></header>
+
+<aside id="sidebar"></aside>
+
+<footer id="appFooter"></footer>
+
+app-shell.js fills those elements using innerHTML.
+
+Important concept:
+
+innerHTML allows JavaScript to insert HTML content into
+an existing HTML element.
+
+Architecture:
+
+Page HTML
+    ↓
+Provides placeholders + feature content
+
+app-shell.js
+    ↓
+Provides common UI
+
+style.css
+    ↓
+Provides common appearance
+
+
+SRP:
+
+dashboard.js:
+    Protects the dashboard.
+
+app-shell.js:
+    Creates and controls the common shell.
+
+session.js:
+    Manages sessions.
+
+These are separate responsibilities.
+
+Dependency order:
+
+session.js
+    ↓
+dashboard.js
+    ↓
+app-shell.js
+
+session.js must load first because both other files use
+functions defined there.
+
+
+Important team rule:
+
+Feature owners should primarily work inside:
+
+<main class="main-content">
+
+They should not duplicate or redesign the common header,
+sidebar, or footer unless a common-shell requirement changes.
+
+This allows Member 1 to maintain the common UI in one place.
+
+COMMON SHELL CONTRACT
+
+Every protected application page should contain:
+
+<header id="appHeader"></header>
+
+<aside id="sidebar"></aside>
+
+<footer id="appFooter"></footer>
+
+and load:
+
+session.js
+dashboard.js
+app-shell.js
+
+The page-specific functionality belongs inside:
+
+<main class="main-content">
+
+app-shell.js creates the common UI.
+
+Feature pages should not duplicate the header,
+sidebar, or footer.
+
+Sidebar navigation is maintained centrally by Member 1.
+
+Changes to the common sidebar should normally be made
+in app-shell.js rather than separately in every page.
+
+
+

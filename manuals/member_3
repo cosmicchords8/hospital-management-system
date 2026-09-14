@@ -1,0 +1,416 @@
+STEP 1 — Patient Edit/Delete Responsibility
+
+Ownership:
+
+Member 3 — US003 + US004
+
+Responsibilities:
+
+Edit existing patient
+Delete existing patient
+
+The patient details/edit/delete functionality has not yet
+been implemented.
+
+Navigation and common application shell are currently being
+established first.
+
+Important ownership boundary:
+
+Member 3 works with existing patient records.
+
+Member 3 does not own:
+
+Patient creation → Member 2
+Patient list/search → Member 4
+Billing → Member 5
+
+Upcoming concepts:
+
+Patient details
+Edit form
+Immutable fields
+Validation reuse
+Version history
+Audit information
+Soft delete
+Delete confirmation
+
+
+COMMON SHELL RULE
+
+Patient edit/delete functionality uses the common
+application shell.
+
+Feature-specific work belongs inside the page's:
+
+<main class="main-content">
+
+The common shell is maintained by Member 1.
+
+STEP 3 — Patient Details Hub
+
+The planned patient flow is:
+
+All Patients
+    ↓
+Open
+    ↓
+Patient Details
+    ↓
+Edit Patient
+Delete Patient
+Create Bill
+
+The Patient Details page will become the central place
+for viewing an individual patient.
+
+Edit and Delete functionality will be implemented later.
+
+Member 3 should reuse the existing patient data rather
+than creating another patient storage system.
+
+STEP 4 — Patient Details Foundation
+
+A Patient Details page now exists.
+
+Flow:
+
+All Patients
+    ↓
+Open
+    ↓
+Patient Details
+
+The current page only displays patient information.
+
+It does not edit or delete anything yet.
+
+This page will eventually provide:
+
+Edit Patient
+Delete Patient
+
+Patient Details is therefore the starting point for
+US003 and US004.
+
+STEP 5 — Patient Actions
+
+Patient Details now provides:
+
+Edit Patient
+Delete Patient
+
+The current Edit link navigates to:
+
+edit-patient.html?patientId=PAT-000001
+
+The current Delete link is only a placeholder.
+
+No deletion occurs yet.
+
+Future Delete flow:
+
+Patient Details
+    ↓
+Delete Patient
+    ↓
+Confirmation
+    ↓
+Soft delete
+    ↓
+Save patient
+
+Future Edit flow:
+
+Patient Details
+    ↓
+Edit Patient
+    ↓
+Load existing patient
+    ↓
+Change editable fields
+    ↓
+Save changes
+
+STEP 6 — Basic Edit Patient
+
+New file:
+
+hospital/edit-patient.html
+
+JavaScript:
+
+hospital/js/edit-patient.js
+
+The Edit Patient page reuses the same form structure
+as New Patient.
+
+This avoids creating a second completely different
+patient form.
+
+
+Difference:
+
+New Patient:
+    patient-form.js
+
+Edit Patient:
+    edit-patient.js
+
+
+Edit flow:
+
+All Patients
+    ↓
+Open
+    ↓
+Patient Details
+    ↓
+Edit Patient
+    ↓
+Read patientId from URL
+    ↓
+Find patient
+    ↓
+Load values into form
+    ↓
+User changes values
+    ↓
+Validate
+    ↓
+Update patient
+    ↓
+savePatients()
+
+
+URL example:
+
+edit-patient.html?patientId=PAT-000001
+
+
+findIndex()
+
+is used to find the position of the patient
+inside the patients array.
+
+Example concept:
+
+const patientIndex =
+    patients.findIndex(function (patient) {
+
+        return patient.patientId === patientId;
+
+    });
+
+
+If patientIndex is -1, the patient was not found.
+
+
+IMPORTANT:
+
+Patient ID is not changed during editing.
+
+The edit code updates fields such as:
+
+firstName
+lastName
+dob
+gender
+bloodGroup
+height
+weight
+mobile
+email
+address
+city
+state
+pin
+emergencyContact
+
+
+It does not assign a new patientId.
+
+Validation:
+
+Edit uses the existing validation functions
+from validation.js.
+
+This avoids having different validation rules
+for creating and editing patients.
+
+
+Current edit implementation:
+
+Load patient
+    ↓
+Display existing values
+    ↓
+Change values
+    ↓
+Validate
+    ↓
+Save updated patient
+
+
+Current limitations:
+
+No version history yet.
+No audit event yet.
+No unsaved changes warning.
+No confirmation dialog.
+
+These can be added later only if required.
+
+
+EDIT PATIENT
+
+File:
+hospital/edit-patient.html
+
+Purpose:
+Provides a form for editing an existing patient.
+
+The patient ID is received from the URL:
+
+edit-patient.html?patientId=PAT-000001
+
+Patient ID:
+readonly
+
+SSN:
+readonly
+
+Patient ID and SSN cannot be changed.
+
+File:
+hospital/js/edit-patient.js
+
+Responsibilities:
+1. Read patientId from the URL.
+2. Find the patient in localStorage.
+3. Display existing patient information.
+4. Validate edited information.
+5. Update editable patient fields.
+6. Save the updated patient list.
+
+The edit code does not change:
+- patientId
+- ssn
+- createdAt
+- createdBy
+
+When an update succeeds:
+- updatedAt is stored.
+- updatedBy is stored.
+- the patient list is saved using savePatients().
+
+Important:
+edit-patient.js reuses:
+- validation.js
+- patient-data.js
+- session.js
+
+Basic flow:
+
+Patient Details
+→ Edit Patient
+→ Read patientId
+→ Find patient
+→ Fill form
+→ Edit fields
+→ Validate
+→ Update patient
+→ Save to localStorage
+
+US004 — DELETE PATIENT
+
+File:
+hospital/js/delete-patient.js
+
+Purpose:
+Handles deleting a patient from the active patient list.
+
+The system uses SOFT DELETE.
+
+The patient object is NOT removed from localStorage.
+
+Instead:
+
+patient.deleted = true;
+
+patient.deletedAt = new Date().toISOString();
+
+patient.deletedBy = getCurrentUser();
+
+
+Delete flow:
+
+Patient Details
+→ Delete Patient
+→ Browser confirmation
+→ User confirms
+→ Mark patient as deleted
+→ Save patient list
+→ Return to All Patients
+
+
+The All Patients page already ignores patients where:
+
+patient.deleted === true
+
+
+Therefore deleted patients disappear from the normal patient list
+without being physically removed from storage.
+
+The delete code uses:
+
+getPatients()
+savePatients()
+getCurrentUser()
+
+These functions come from existing JavaScript files.
+
+delete-patient.js must be loaded after:
+
+session.js
+patient-data.js
+
+
+A deleted patient should not be edited or deleted again.
+The code checks for this condition.
+
+The browser's built-in confirm() function is used instead
+of creating a custom modal. This keeps the implementation simple.
+
+
+US004 — DELETE PATIENT
+
+Delete Patient is a button, not a link.
+
+patient-details.js:
+- Displays patient information.
+- Sets the Edit Patient link.
+- Sets the Create Bill link.
+- Does NOT handle deletion.
+
+delete-patient.js:
+- Handles the Delete Patient button.
+- Finds the patient using the patientId from the URL.
+- Asks for confirmation using confirm().
+- Uses soft delete.
+
+Soft delete:
+
+patient.deleted = true;
+patient.deletedAt = new Date().toISOString();
+patient.deletedBy = getCurrentUser();
+
+The patient is not physically removed from localStorage.
+
+savePatients(patients) saves the change.
+
+All Patients hides records where:
+
+patient.deleted === true
+

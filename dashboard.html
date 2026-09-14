@@ -1,0 +1,258 @@
+<!-- hospital/dashboard.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Dashboard - Hospital Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header
+        class="app-header"
+        id="appHeader"
+    >
+    </header>
+
+
+    <div class="app-layout">
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+        </aside>
+
+
+        <main class="main-content">
+
+            <h2>
+                Dashboard
+            </h2>
+
+
+            <div id="welcomeMessage">
+            </div>
+
+
+            <h3>
+                Overview
+            </h3>
+
+
+            <div class="dashboard-cards">
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        Active Patients
+                    </h3>
+
+                    <p id="patientCount">
+                        0
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        Active Bills
+                    </h3>
+
+                    <p id="billCount">
+                        0
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        Paid Bills
+                    </h3>
+
+                    <p id="paidBillCount">
+                        0
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        Unpaid Bills
+                    </h3>
+
+                    <p id="unpaidBillCount">
+                        0
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <h3>
+                Quick Actions
+            </h3>
+
+
+            <p>
+                <a href="new-patient.html">
+                    Create New Patient
+                </a>
+            </p>
+
+            <p>
+                <a href="patients.html">
+                    View Patients
+                </a>
+            </p>
+
+            <p>
+                <a href="billing.html">
+                    Create Bill
+                </a>
+            </p>
+
+            <p>
+                <a href="bills.html">
+                    View Bills
+                </a>
+            </p>
+
+        </main>
+
+    </div>
+
+
+    <footer
+        class="app-footer"
+        id="appFooter"
+    >
+    </footer>
+
+
+    <script src="js/session.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+    <script src="js/patient-data.js"></script>
+
+    <script src="js/bill-data.js"></script>
+
+    <script src="js/app-shell.js"></script>
+
+    <script>
+
+        // Show logged-in user
+
+        const currentUser =
+            getCurrentUser();
+
+        document.getElementById(
+            "welcomeMessage"
+        ).textContent =
+            "Welcome, " + currentUser + "!";
+
+
+        // Get patients and bills
+
+        const patients =
+            getPatients();
+
+        const bills =
+            getBills();
+
+
+        // Count active patients
+
+        const activePatients =
+            patients.filter(
+                function (patient) {
+                    return !patient.deleted;
+                }
+            );
+
+
+        // Count active bills
+
+        const activeBills =
+            bills.filter(
+                function (bill) {
+                    return !bill.deleted;
+                }
+            );
+
+
+        // Count paid and unpaid bills
+
+        const paidBills =
+            activeBills.filter(
+                function (bill) {
+                    return bill.paymentStatus === "PAID";
+                }
+            );
+
+
+        const unpaidBills =
+            activeBills.filter(
+                function (bill) {
+                    return bill.paymentStatus === "UNPAID";
+                }
+            );
+
+
+        // Display counts
+
+        document.getElementById(
+            "patientCount"
+        ).textContent =
+            activePatients.length;
+
+
+        document.getElementById(
+            "billCount"
+        ).textContent =
+            activeBills.length;
+
+
+        document.getElementById(
+            "paidBillCount"
+        ).textContent =
+            paidBills.length;
+
+
+        document.getElementById(
+            "unpaidBillCount"
+        ).textContent =
+            unpaidBills.length;
+
+    </script>
+
+
+</body>
+
+</html>

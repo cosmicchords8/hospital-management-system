@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Makes the page work properly on different screen sizes -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hospital Management System - Login</title>
+
+    <!-- Our global CSS file -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!--
+        Login container
+
+        This page currently has only one responsibility:
+        display the login form and collect user input.
+    -->
+    <main class="login-container">
+
+        <section class="login-box">
+
+            <h1>Hospital Management System</h1>
+
+            <p class="login-subtitle">
+                Admission Desk Login
+            </p>
+
+
+            <!--
+                Login form
+
+                Using a form means pressing Enter inside an input
+                can submit the login.
+            -->
+            <form id="loginForm">
+
+                <!-- User ID -->
+                <div class="form-group">
+
+                    <label for="userId">
+                        User ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="userId"
+                        name="userId"
+                        placeholder="Enter your user ID"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <!--
+                    This paragraph is initially empty.
+
+                    JavaScript will use it to display messages such as:
+                    "Invalid user ID or password."
+                -->
+                <p id="loginMessage" class="error-message"></p>
+
+
+                <button type="submit" class="primary-button">
+                    Login
+                </button>
+
+                <p style="margin-top: 20px; text-align: center;">
+
+                    Don't have an account?
+
+                    <a href="signup.html">
+                        Create Account
+                    </a>
+
+                </p>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!--
+        JavaScript files
+
+        session.js is loaded first because auth.js uses
+        the session functions.
+
+        The order matters.
+    -->
+    <script src="js/session.js"></script>
+    <script src="js/user-data.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/login-attempts.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>

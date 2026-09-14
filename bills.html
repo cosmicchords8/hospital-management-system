@@ -1,0 +1,178 @@
+// hospital/bills.html
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        All Bills - Hospital Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header
+        class="app-header"
+        id="appHeader"
+    >
+    </header>
+
+
+    <div class="app-layout">
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+        </aside>
+
+
+        <main class="main-content">
+
+            <h2>
+                All Bills
+            </h2>
+
+            <div id="billSearch">
+
+                <div class="form-group">
+
+                    <label for="billPatientSearch">
+                        Search Patient ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="billPatientSearch"
+                        placeholder="Example: PAT-000001"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="billIdSearch">
+                        Search Bill ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="billIdSearch"
+                        placeholder="Example: BILL-000001"
+                    >
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="searchBillButton"
+                >
+                    Search
+                </button>
+
+
+                <button
+                    type="button"
+                    id="clearBillSearchButton"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+
+            
+
+
+            <p>
+                Total Bills:
+                <span id="billCount">0</span>
+            </p>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Bill ID
+                        </th>
+
+                        <th>
+                            Patient ID
+                        </th>
+
+                        <th>
+                            Created
+                        </th>
+
+                        <th>
+                            Total
+                        </th>
+
+                        <th>
+                            Payment Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="billTableBody">
+                </tbody>
+
+            </table>
+
+
+            <p id="billListMessage">
+            </p>
+
+        </main>
+
+    </div>
+
+
+    <footer
+        class="app-footer"
+        id="appFooter"
+    >
+    </footer>
+
+
+    <script src="js/session.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+    <script src="js/bill-data.js"></script>
+
+    <script src="js/bills.js"></script>
+
+    <script src="js/app-shell.js"></script>
+
+</body>
+
+</html>

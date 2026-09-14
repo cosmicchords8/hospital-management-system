@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Edit Bill - Hospital Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header
+        class="app-header"
+        id="appHeader"
+    >
+    </header>
+
+
+    <div class="app-layout">
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+        </aside>
+
+
+        <main class="main-content">
+
+            <h2>
+                Edit Bill
+            </h2>
+
+
+            <div id="billInfo">
+                Loading bill...
+            </div>
+
+
+            <form id="editBillForm">
+
+                <h3>
+                    Room Charges
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label for="roomType">
+                        Room Type
+                    </label>
+
+                    <select id="roomType">
+
+                        <option value="">
+                            Select Room
+                        </option>
+
+                        <option value="General">
+                            General
+                        </option>
+
+                        <option value="Semi Private">
+                            Semi Private
+                        </option>
+
+                        <option value="Private">
+                            Private
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="roomDays">
+                        Number of Days
+                    </label>
+
+                    <input
+                        type="number"
+                        id="roomDays"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="dailyRate">
+                        Daily Rate
+                    </label>
+
+                    <input
+                        type="number"
+                        id="dailyRate"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <h3>
+                    Pharmacy
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label for="medicineName">
+                        Medicine Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="medicineName"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="medicineQuantity">
+                        Quantity
+                    </label>
+
+                    <input
+                        type="number"
+                        id="medicineQuantity"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="medicineRate">
+                        Rate
+                    </label>
+
+                    <input
+                        type="number"
+                        id="medicineRate"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="addMedicineButton"
+                >
+                    Add Medicine
+                </button>
+
+
+                <div id="medicineList">
+                </div>
+
+
+                <h3>
+                    Diagnostics
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label for="testName">
+                        Test Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="testName"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="testRate">
+                        Test Rate
+                    </label>
+
+                    <input
+                        type="number"
+                        id="testRate"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="addTestButton"
+                >
+                    Add Test
+                </button>
+
+
+                <div id="testList">
+                </div>
+
+
+                <h3>
+                    Total
+                </h3>
+
+
+                <p>
+                    Room Total:
+                    <span id="roomTotal">
+                        0
+                    </span>
+                </p>
+
+
+                <p>
+                    Pharmacy Total:
+                    <span id="pharmacyTotal">
+                        0
+                    </span>
+                </p>
+
+
+                <p>
+                    Diagnostics Total:
+                    <span id="diagnosticsTotal">
+                        0
+                    </span>
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Grand Total:
+                    </strong>
+
+                    <span id="grandTotal">
+                        0
+                    </span>
+
+                </p>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Save Changes
+                </button>
+
+
+                <button
+                    type="button"
+                    id="cancelEditButton"
+                >
+                    Cancel
+                </button>
+
+
+                <p id="editBillMessage">
+                </p>
+
+
+            </form>
+
+        </main>
+
+    </div>
+
+
+    <footer
+        class="app-footer"
+        id="appFooter"
+    >
+    </footer>
+
+
+    <script src="js/session.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+    <script src="js/bill-data.js"></script>
+
+    <script src="js/edit-bill.js"></script>
+
+    <script src="js/app-shell.js"></script>
+
+
+</body>
+
+</html>

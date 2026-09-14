@@ -1,0 +1,401 @@
+STEP 1 — Patient List Page Introduced
+
+File:
+
+hospital/patients.html
+
+Ownership:
+
+Member 4 — US005 + US006
+
+Purpose:
+
+This page will eventually display active patient records.
+
+Current state:
+
+The page contains placeholder content only.
+
+The sidebar navigation already points to:
+
+patients.html
+
+Future responsibilities:
+
+View active patients
+Pagination
+Search by Patient ID
+Filtering
+Sorting
+Empty state
+Patient selection/details
+
+Important:
+
+Member 4 should not implement patient creation,
+editing, or deletion here.
+
+Those responsibilities belong to:
+
+Member 2 — Create Patient
+Member 3 — Edit/Delete Patient
+
+Member 4 will consume patient data created by the
+patient data layer.
+
+STEP 2 — Patient List Uses Common Shell
+
+File:
+
+hospital/patients.html
+
+The Patient List page uses the common application shell.
+
+Member 4 should focus on:
+
+<main class="main-content">
+
+Future responsibilities include:
+
+Active patient list
+Pagination
+Search by Patient ID
+Filtering
+Sorting
+Empty state
+
+The header/sidebar/footer are common components maintained
+by Member 1.
+
+COMMON SHELL RULE
+
+The Patient List page uses the common application shell.
+
+Member 4 owns the patient-list functionality inside:
+
+<main class="main-content">
+
+Common navigation and layout remain owned by Member 1.
+
+
+STEP 3 — Display Patient Records
+
+File:
+
+hospital/patients.html
+
+JavaScript:
+
+hospital/js/patient-list.js
+
+Responsibility:
+
+Display existing patient records.
+
+The patient list does NOT create patient records.
+
+Patient creation belongs to Member 2.
+
+Data source:
+
+patient-data.js
+
+Function used:
+
+getPatients()
+
+The patient list gets the patient array and displays
+the records in an HTML table.
+
+
+Basic flow:
+
+patients.html
+    ↓
+patient-list.js
+    ↓
+getPatients()
+    ↓
+patients array
+    ↓
+HTML table
+
+
+DOM CONCEPT:
+
+The DOM represents the HTML page as objects that JavaScript
+can interact with.
+
+Example:
+
+document.getElementById("patientTableBody")
+
+finds the <tbody> element.
+
+document.createElement("tr")
+
+creates a new table row.
+
+appendChild()
+
+adds the new row to the table.
+
+
+The first implementation intentionally uses basic DOM
+operations rather than a complicated UI system.
+
+
+Deleted patients:
+
+The list checks:
+
+patient.deleted
+
+If it is true, the patient is skipped.
+
+Therefore the normal patient list shows active records only.
+
+This prepares the application for the soft-delete behavior
+planned for US004.
+
+
+Current patient list:
+
+The first version only displays:
+
+Patient ID
+Name
+DOB
+Gender
+Mobile
+
+Search, filtering, sorting and pagination are NOT implemented
+yet.
+
+Those belong to later US006/US005 work.
+
+Important principle:
+
+Implement the simplest working version first.
+
+Do not add search, filtering, sorting or pagination until
+the basic patient display is working.
+
+STEP 4 — Patient Table
+
+The patient list uses an HTML table.
+
+patients.html provides:
+
+<table>
+<thead>
+<tbody>
+
+patient-list.js creates rows and cells using the DOM.
+
+The first version displays:
+
+Patient ID
+Name
+DOB
+Gender
+Mobile
+
+Deleted patients are skipped.
+
+Future enhancement:
+
+Each row will eventually have an Open option.
+
+Open will lead to Patient Details.
+
+Search, sorting, filtering and pagination will be added
+later rather than all at once.
+
+STEP 5 — Open Patient
+
+The Patient List now has an Open option.
+
+patients.html contains an Action column.
+
+patient-list.js creates an Open link for each patient.
+
+The link looks like:
+
+patient-details.html?patientId=PAT-000001
+
+The Patient ID is passed through the URL.
+
+New file:
+
+hospital/patient-details.html
+
+New JavaScript:
+
+hospital/js/patient-details.js
+
+patient-details.js reads the Patient ID from the URL using:
+
+window.location.search
+
+and:
+
+URLSearchParams
+
+It then gets the patient array using:
+
+getPatients()
+
+and finds the matching patient.
+
+Basic flow:
+
+All Patients
+    ↓
+Open
+    ↓
+Patient Details
+    ↓
+Read patientId from URL
+    ↓
+getPatients()
+    ↓
+Find patient
+    ↓
+Display details
+
+
+The Patient Details page is currently read-only.
+
+Future functionality:
+
+Edit Patient
+Delete Patient
+Create Bill
+
+These will be implemented by the appropriate team
+members later.
+
+STEP 6 — Open Action
+
+The patient table now has:
+
+Open
+
+Open navigates to Patient Details and passes the
+patient ID through the URL.
+
+Example:
+
+patient-details.html?patientId=PAT-000001
+
+This allows Patient Details to display the selected patient.
+
+ALL PATIENTS — CREATED AND UPDATED
+
+The All Patients table displays:
+
+- Patient ID
+- Name
+- DOB
+- Gender
+- Mobile
+- Created
+- Updated
+- Action
+
+createdAt:
+Shows when the patient was originally created.
+
+updatedAt:
+Shows when the patient was last edited.
+
+If updatedAt does not exist, the table displays "-".
+
+patient-list.js contains a small formatDateTime()
+function to convert the stored ISO date into a readable
+date and time.
+
+Example:
+
+Created: 14/09/2026, 10:30 AM
+Updated: 14/09/2026, 10:45 AM
+
+US005 — VIEW ACTIVE PATIENTS
+
+The All Patients page displays active patients.
+
+Deleted patients are not displayed.
+
+The page shows:
+- Active patient count
+- Patient table
+- 5 patients per page
+- Previous button
+- Next button
+- Current page information
+
+PATIENTS_PER_PAGE = 5
+
+Pagination works by using:
+- currentPage
+- slice()
+- Math.ceil()
+
+filter() is used to create a list containing
+only active patients.
+
+Example:
+
+deleted = false
+→ patient is shown
+
+deleted = true
+→ patient is hidden
+
+
+Patient list flow:
+
+getPatients()
+→ filter active patients
+→ count active patients
+→ select current page
+→ display table
+
+
+US006 — SEARCH PATIENT BY ID
+
+Search is part of the All Patients page.
+
+The user can search using Patient ID.
+
+Search:
+- ignores uppercase/lowercase
+- removes spaces at the beginning/end
+- works with the Search button
+- works with Enter
+- has a Clear button
+- searches active patients only
+
+Deleted patients are not searchable.
+
+Search and pagination work together.
+
+When a search is performed:
+currentPage is reset to 1.
+
+If no matching active patient exists:
+
+"No active patient found."
+
+Clear search:
+- removes the search text
+- resets currentPage to 1
+- displays all active patients again.
+
+patient-list.js is responsible for displaying
+and searching the active patient list.
+
+
+
+

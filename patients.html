@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Patients - Hospital Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <header
+        class="app-header"
+        id="appHeader"
+    >
+    </header>
+
+
+    <div class="app-layout">
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+        </aside>
+
+
+        
+
+        <main class="main-content">
+
+            <h2>
+                Patients
+            </h2>
+
+            <div id="patientSearch">
+
+                <label for="patientSearchInput">
+                    Search Patient ID
+                </label>
+
+                <input
+                    type="text"
+                    id="patientSearchInput"
+                    placeholder="Example: PAT-000001"
+                >
+
+                <button
+                    type="button"
+                    id="searchPatientButton"
+                >
+                    Search
+                </button>
+
+                <button
+                    type="button"
+                    id="clearSearchButton"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+
+            <p>
+                Active Patients:
+                <span id="activePatientCount">
+                    0
+                </span>
+            </p>
+
+
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Patient ID</th>
+
+                        <th>Name</th>
+
+                        <th>DOB</th>
+
+                        <th>Gender</th>
+
+                        <th>Mobile</th>
+
+                        <th>
+                            Created
+                        </th>
+
+                        <th>
+                            Created By
+                        </th>
+
+                        <th>
+                            Updated
+                        </th>
+
+                        <th>
+                            Updated By
+                        </th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="patientTableBody">
+                </tbody>
+
+            </table>
+
+            <div id="pagination">
+
+                <button
+                    type="button"
+                    id="previousButton"
+                >
+                    Previous
+                </button>
+
+                <span id="pageInfo">
+                    Page 1
+                </span>
+
+                <button
+                    type="button"
+                    id="nextButton"
+                >
+                    Next
+                </button>
+
+            </div>
+
+
+
+            <p id="patientListMessage"></p>
+
+        </main>
+
+
+
+        
+
+    </div>
+
+
+    <footer
+        class="app-footer"
+        id="appFooter"
+    >
+    </footer>
+
+
+    <script src="js/session.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+    <script src="js/patient-data.js"></script>
+
+    <script src="js/patient-list.js"></script>
+
+    <script src="js/app-shell.js"></script>
+
+
+</body>
+
+</html>
